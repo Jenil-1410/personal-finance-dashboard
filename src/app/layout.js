@@ -1,7 +1,6 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "../_components/Navbar";
-import Link from "next/link";
+import { FirebaseProvider } from "@/features/FirebaseContext"; // Update this import
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -14,21 +13,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${inter.className} h-screen`}>
-        <div className="flex h-full w-full">
-          <div className="w-[15%]">
-            <Navbar />
-          </div>
-          <div className="w-full">
-            <div className='mb-2 p-2 w-auto flex items-center justify-between'>
-              <p>Hello Jenil Patel</p>
-              <Link href={'/register'}>
-                <button className='rounded-md border-[0.5px] border-gray-700 p-1 z-10'>SignUp/SignIn</button>
-              </Link>
-            </div>
-            {children}
-          </div>
-        </div>
+        <FirebaseProvider> {/* Use FirebaseProvider here */}
+          {children}
+        </FirebaseProvider>
       </body>
     </html>
-  )
+  );
 }

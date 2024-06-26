@@ -1,6 +1,7 @@
 'use client';
 import { faTableColumns } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Image from 'next/image';
 import Link from 'next/link'
 import { usePathname } from 'next/navigation';
 import React from 'react'
@@ -11,7 +12,10 @@ const Navbar = () => {
   return (
     <div className='w-full h-full bg-white text-black'>
         <div className='h-full flex flex-col'>
-            <div className='h-[5%]'>LOGO</div>
+            <div className='h-[5%]'>
+                Logo
+                {/* <Image src="/images/App_Logo.png" height={20} width={20} /> */}
+            </div>
             <div className='h-[80%] py-8 pr-5 border-y-2 border-gray-300'>
                 <Link href={'/'}>
                     <div className= {currPath === '/' ? 'bg-black text-white py-2 pl-5 rounded-r' : 'py-2 pl-5 rounded-r'}>Home</div>

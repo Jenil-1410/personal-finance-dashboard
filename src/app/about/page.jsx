@@ -1,11 +1,20 @@
 'use client'
 import React from 'react'
+import Navbar from '@/_components/Navbar';
+import UserNavbar from '@/_components/UserNavbar';
 
 const page = () => {
+
   return (
-    <>
-      <h1>About Us</h1>
-    </>
+    <div className="flex h-full w-full">
+      <div className="w-[15%]">
+        <Navbar />
+      </div>
+      <div className="w-full">
+        <UserNavbar />
+        <h1>About Us</h1>
+      </div>
+    </div>
   )
 }
 

@@ -6,6 +6,6 @@ const conf = {
     firebaseMessagingsenderId : String(process.env.REACT_APP_FIREBASE_MESSAGINGSENDER_ID),
     firebaseAppId : String(process.env.REACT_APP_FIREBASE_APP_ID),
     firebaseMeasurementId : String(process.env.REACT_APP_FIREBASE_MEASUREMENT_ID)
-}
+};
 
 export default conf

@@ -1,119 +1,120 @@
-'use client'
+'use client';
+import { auth, db } from '@/FirebaseConfig';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore/lite';
 import Link from 'next/link';
-import React, { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation';
+import React, { useEffect, useRef } from 'react';
+import { useForm } from 'react-hook-form';
 
-const page = () => {
-    const userRef = useRef()
-    const errRef = useRef()
+const Page = () => {
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setFocus,
+    formState: { errors }
+  } = useForm();
+  const password = useRef({});
+  password.current = watch("password", "");
 
-    const [usr, setUsr] = useState('')
+  const router = useRouter();
 
-    const [email, setEmail] = useState('')
+  useEffect(() => {
+    setFocus('username');
+  }, [setFocus]);
 
-    const [pass, setPass] = useState('')
+  const addUserToFirestore = async (uid, email, data) => {
+    try {
+      const usersCollection = doc(db, "users", uid);
+      await setDoc(usersCollection, {
+        uid: uid,
+        email: email,
+        first_name: data.firstName,
+        last_name: data.lastName,
+        role: "user"
+      });
 
-    const [cpass, setCpass] = useState('')
-    const [validCpass, setValidCpass] = useState(false)
-    const [cpassFocus, setCpassFocus] = useState(false)
+      console.log("User added to Firestore successfully!");
+    } catch (error) {
+      console.error("Error adding user to Firestore: ", error);
+    }
+  };
 
-    const [errMsg, setErrMsg] = useState('')
-
-    useEffect(() => {
-        userRef.current.focus();
-    }, [])
-
-    useEffect(() => {
-      const match = pass === cpass
-      setValidCpass(match)
-    }, [pass, cpass])
-
-    useEffect(() => {
-      setErrMsg('')
-    }, [usr, pass, cpass])
-
-    // const addUserToFirestore = async (uid, email) => {
-    //   try {
-    //     // Reference the "users" collection
-    //     const usersCollection = collection(db, "users");
-    //     console.log('creating database')
-    //     // Add a new document with the user's information
-    //     await addDoc(usersCollection, {
-    //       uid: uid,
-    //       email: email
-    //       // Add additional user data as needed
-    //     });
-    
-    //     console.log("User added to Firestore successfully!");
-    //   } catch (error) {
-    //     console.error("Error adding user to Firestore: ", error);
-    //   }
-    // };
-
-    // const handleSubmit = async(e) => {
-    //   e.preventDefault()
-    //   const v1 = USER_REGEX.test(usr)
-    //   const v2 = PASS_REGEX.test(pass)
-    //   if(!v1 || !v2){
-    //     setErrMsg('Invalid Entry')
-    //     return
-    //   }
-    //   // try {
-    //   createUserWithEmailAndPassword(database, email, pass)
-    //   .then(data => addUserToFirestore(data.user.uid, data.user.email))
-    //   .catch((err)=>{
-    //     setErrMsg(err.message)
-    //   })
-    // }
+  const onSubmit = async (data) => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+      await addUserToFirestore(userCredential.user.uid, userCredential.user.email, data);
+      router.push('/dashboard');
+    } catch (err) {
+      setError("formError", {
+        type: "manual",
+        message: err.message
+      });
+    }
+  };
 
   return (
     <>
-        <div className='h-[85%] flex justify-center items-center'>
-        <form className='bg-black text-white h-fit w-1/4 p-5'>
-          <p ref={errRef} className={errMsg ? 'text-red-500 text-center' : 'hidden'}>{errMsg}</p>
+      <div className='h-[85%] flex justify-center items-center'>
+        <form className='bg-black text-white h-fit w-1/4 p-5' onSubmit={handleSubmit(onSubmit)}>
+          {errors.formError && <p className='text-red-500 text-center'>{errors.formError.message}</p>}
           <h1 className='text-2xl font-semibold'>Register</h1>
           <br/>
           <div>
-              <label htmlFor='usrname'>Username: </label><br />
-              <input id='usrname' type='text' ref={userRef} className='w-full rounded-md text-black box-border pl-1' value={usr} autoComplete='on'
-              onChange={(e) => {setUsr(e.target.value)
-              }}></input>
+            <label htmlFor='username'>Username: </label><br />
+            <input id='username' className='w-full rounded-md text-black box-border pl-1' {...register("username", { required: "Username is required" })} />
+            {errors.username && <p className='text-red-500'>{errors.username.message}</p>}
+          </div>
+          <br/>
+          <div className='flex justify-between gap-4'>
+            <div>
+              <label htmlFor='firstName'>Firstname: </label><br />
+              <input id='firstName' className='w-full rounded-md text-black box-border pl-1' {...register("firstName", { required: "First name is required" })} />
+              {errors.firstName && <p className='text-red-500'>{errors.firstName.message}</p>}
+            </div>
+            <div>
+              <label htmlFor='lastName'>Lastname: </label><br />
+              <input id='lastName' className='w-full rounded-md text-black box-border pl-1' {...register("lastName", { required: "Last name is required" })} />
+              {errors.lastName && <p className='text-red-500'>{errors.lastName.message}</p>}
+            </div>
           </div>
           <br/>
           <div>
-              <label htmlFor='email'>Email Id: </label><br />
-              <input id='usrname' type='email' className='w-full rounded-md text-black box-border pl-1' value={email} autoComplete='on'
-              onChange={(e) => {setEmail(e.target.value)}}></input>
+            <label htmlFor='email'>Email Id: </label><br />
+            <input id='email' type='email' className='w-full rounded-md text-black box-border pl-1' {...register("email", { required: "Email is required" })} />
+            {errors.email && <p className='text-red-500'>{errors.email.message}</p>}
           </div>
           <br/>
           <div>
-              <label htmlFor='pwd'>Password:</label><br />
-              <input id='pwd' type='password' className='w-full rounded-md text-black box-border pl-1' value={pass} autoComplete='off'
-              onChange={(e) => {setPass(e.target.value)
-              }}></input>
+            <label htmlFor='password'>Password:</label><br />
+            <input id='password' type='password' className='w-full rounded-md text-black box-border pl-1' {...register("password", {
+              required: "Password is required",
+              minLength: { value: 6, message: "Password must be at least 6 characters long" }
+            })} />
+            {errors.password && <p className='text-red-500'>{errors.password.message}</p>}
           </div>
           <br/>
           <div>
-              <label htmlFor='cpwd'>Confirm Password:</label><br />
-              <input id='cpwd' type='password' className='w-full rounded-md text-black box-border pl-1' value={cpass} autoComplete='off'
-              onChange={(e) => {setCpass(e.target.value)
-              }}></input>
-          </div>
-          <p id='confirmnote' className={cpassFocus &&!validCpass ? 'visible text-red-600' : 'hidden'}>
-              Must match the first password.
-          </p>
-          <br/>
-          <div>
-              <button disabled={cpass==='' || !validCpass ? true: false} className={cpass==='' || !validCpass ?'bg-gray-500 w-full text-black p-1 rounded-md hover:cursor-not-allowed' : 'bg-white w-full text-black p-1 rounded-md'}>Sign Up</button>
+            <label htmlFor='confirmPassword'>Confirm Password:</label><br />
+            <input id='confirmPassword' type='password' className='w-full rounded-md text-black box-border pl-1' {...register("confirmPassword", {
+              validate: value => value === password.current || "Passwords do not match"
+            })} />
+            {errors.confirmPassword && <p className='text-red-500'>{errors.confirmPassword.message}</p>}
           </div>
           <br/>
           <div>
-              <p>Existing User?</p>
-              <Link href={'/login'}><p className='text-blue-500'><u>Sign In</u></p></Link>
+            <button disabled={Object.keys(errors).length > 0} className={Object.keys(errors).length > 0 ? 'bg-gray-500 w-full text-black p-1 rounded-md hover:cursor-not-allowed' : 'bg-white w-full text-black p-1 rounded-md'}>Sign Up</button>
+          </div>
+          <br/>
+          <div>
+            <p>Existing User?</p>
+            <Link href={'/login'}><p className='text-blue-500'><u>Sign In</u></p></Link>
           </div>
         </form>
-      </div>     
+      </div>
     </>
-  )
+  );
 }
 
-export default page
+export default Page;
