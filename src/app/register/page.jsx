@@ -1,5 +1,6 @@
 'use client';
 import { auth, db } from '@/FirebaseConfig';
+import { useMain } from '@/features/MainContext';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore/lite';
 import Link from 'next/link';
@@ -8,6 +9,9 @@ import React, { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 
 const Page = () => {
+
+  const { currData } = useMain();
+
   const {
     register,
     handleSubmit,
@@ -56,7 +60,7 @@ const Page = () => {
 
   return (
     <>
-      <div className='h-[85%] flex justify-center items-center'>
+      <div className='flex justify-center items-center'>
         <form className='bg-black text-white h-fit w-1/4 p-5' onSubmit={handleSubmit(onSubmit)}>
           {errors.formError && <p className='text-red-500 text-center'>{errors.formError.message}</p>}
           <h1 className='text-2xl font-semibold'>Register</h1>
@@ -84,6 +88,56 @@ const Page = () => {
             <label htmlFor='email'>Email Id: </label><br />
             <input id='email' type='email' className='w-full rounded-md text-black box-border pl-1' {...register("email", { required: "Email is required" })} />
             {errors.email && <p className='text-red-500'>{errors.email.message}</p>}
+          </div>
+          <br/>
+          <div>
+            <label htmlFor='mobile'>Mobile Number: </label><br />
+            <input id='mobile' type='tel' className='w-full rounded-md text-black box-border pl-1' {...register("mobile", { required: "Mobile is required" })} />
+            {errors.mobile && <p className='text-red-500'>{errors.mobile.message}</p>}
+          </div>
+          <br/>
+          <div>
+            <label htmlFor='birth'>Date Of Birth </label><br />
+            <input id='birth' type='date' className='w-full rounded-md text-black box-border pl-1' {...register("birth", 
+              // { required: "Birth-date is required" }
+              )} />
+            {errors.birth && <p className='text-red-500'>{errors.birth.message}</p>}
+          </div>
+          <br/>
+          <div>
+              <label htmlFor='gender'>Gender: </label><br />
+              <select
+                  id='gender'
+                  className='w-full rounded-md text-black box-border pl-1'
+                  defaultValue={""}
+                  {...register('gender', { required: true })}
+              >
+                  <option value="">Select</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+              </select>
+              {errors.gender && <span className="text-red-500">This field is required</span>}
+          </div>
+          <br/>
+          <div>
+              <label htmlFor='currency'>Currency </label><br />
+              <select
+                  id='currency'
+                  className='w-full rounded-md text-black box-border pl-1'
+                  defaultValue={""}
+                  {...register('currency', { required: true })}
+              >
+                  <option value="">Select</option>
+                  {
+                    Object.keys(currData).length > 0 && (
+                      Object.keys(currData).map((curr) => (
+                        <option value={curr} key={curr}>{curr}</option>
+                      ))
+                    )
+                  }
+              </select>
+              {errors.gender && <span className="text-red-500">This field is required</span>}
           </div>
           <br/>
           <div>

@@ -54,7 +54,7 @@ export const FirebaseProvider = ({ children }) => {
 export const useFirebase = () => {
     const context = useContext(FirebaseContext);
     if (!context) {
-        throw new Error('useForm must be used within a FormProvider');
+        throw new Error('useFirebase must be used within a FirebaseProvider');
     }
     return context;
 };
