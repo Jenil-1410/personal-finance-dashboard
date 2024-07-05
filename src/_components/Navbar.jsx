@@ -1,4 +1,5 @@
 'use client';
+import { useFirebase } from '@/features/FirebaseContext';
 import { faTableColumns } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Image from 'next/image';
@@ -8,12 +9,14 @@ import React from 'react'
 
 const Navbar = () => {
     const currPath = usePathname();
+    const { usrData } = useFirebase();
+    console.log(usrData.first_name);
 
   return (
     <div className='w-full h-full bg-white text-black'>
         <div className='h-full flex flex-col'>
-            <div className='h-[5%]'>
-                Logo
+            <div className='h-fit flex justify-center'>
+                <Image src='/images/App_Logo.png' width={100} height={100} className='h-fit' alt='Finance Fusion' />
                 {/* <Image src="/images/App_Logo.png" height={20} width={20} /> */}
             </div>
             <div className='h-[80%] py-8 pr-5 border-y-2 border-gray-300'>
@@ -26,7 +29,7 @@ const Navbar = () => {
                 <Link href={'/blogs'}>
                     <div className= {currPath === '/blogs' ? 'bg-black text-white py-2 pl-5 rounded-r' : 'py-2 pl-5 rounded-r'}>Blogs</div>
                 </Link>
-                <Link href={'/dashboard'}>
+                <Link href={`/dashboard/${usrData.first_name}`}>
                     <div className= {currPath === '/dashboard' ? 'bg-black text-white py-2 pl-5 rounded-r' : 'py-2 pl-5 rounded-r'}><FontAwesomeIcon icon={faTableColumns} className='text-sm'/> Dashboard</div>
                 </Link>
             </div>

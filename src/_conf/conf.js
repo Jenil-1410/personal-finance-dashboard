@@ -6,7 +6,8 @@ const conf = {
     firebaseMessagingsenderId : String(process.env.NEXT_PUBLIC_FIREBASE_MESSAGINGSENDER_ID),
     firebaseAppId : String(process.env.NEXT_PUBLIC_FIREBASE_APP_ID),
     firebaseMeasurementId : String(process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID),
-    apiKey: process.env.NEXT_PUBLIC_API_KEY
+    apiKey: process.env.NEXT_PUBLIC_API_KEY,
+    firebaseAdminSDK: process.env.NEXT_PUBLIC_FIREBASE_ADMIN_SDK
 };
 
 export default conf

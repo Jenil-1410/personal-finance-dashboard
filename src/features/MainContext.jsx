@@ -7,33 +7,21 @@ export const MainContext = createContext()
 
 export const MainProvider = ({ children }) => {
     const [currData, setCurrData] = useState([]);
+    const [addTransc, setAddTransc] = useState(false);
+    const [editTransc, setEditTransc] = useState(false);
     
     const BASE_URL = `https://v6.exchangerate-api.com/v6/${conf.apiKey}/latest/INR`;
 
     useEffect(() => {
-        const localStorageData = localStorage.getItem('currData');
-
-        if (localStorageData) {
-            setCurrData(JSON.parse(localStorageData));
-        } else {
-            axios.get(BASE_URL)
-            .then(response => {
-                setCurrData(response.data.conversion_rates);
-                localStorage.setItem('currData', JSON.stringify(response.data.conversion_rates));
-            })
-            .catch(error => console.error(error));
-        }
+        axios.get(BASE_URL)
+        .then(response => {
+            setCurrData(response.data.conversion_rates);
+        })
+        .catch(error => console.error(error));
     }, [BASE_URL]);
-    
-    useEffect(() => {
-    if (Object.keys(currData).length > 0) {
-        console.log("currData", currData);
-        localStorage.setItem('currData', JSON.stringify(currData));
-    }
-    }, [currData]);
 
     return (
-        <MainContext.Provider value={{ currData }}>
+        <MainContext.Provider value={{ currData, addTransc, setAddTransc, editTransc, setEditTransc }}>
             {children}
         </MainContext.Provider>
     );

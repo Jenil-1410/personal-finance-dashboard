@@ -5,20 +5,26 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
+import { useFirebase } from '@/features/FirebaseContext';
+
+const validationSchema = Yup.object().shape({
+    email: Yup.string().email('Invalid email').required('Email is required'),
+    password: Yup.string().required('Password is required'),
+});
 
 const Page = () => {
-    const { register, handleSubmit, setFocus, setError, formState: { errors } } = useForm();
+    const { usrData } = useFirebase();
+    const { register, handleSubmit, setError, formState: { errors } } = useForm({resolver: yupResolver(validationSchema),});
     const router = useRouter();
-
-    useEffect(() => {
-        setFocus('email');
-    }, [setFocus]);
 
     const onSubmit = async (data) => {
         try {
             const userCredential = await signInWithEmailAndPassword(auth, data.email, data.password);
-            console.log('Auth data:', userCredential);
-            router.push('/dashboard');
+            const idToken = await userCredential.user.getIdToken();
+            document.cookie = `userToken=${idToken}; path=/;`;
+            router.push(`/dashboard/${usrData?.first_name}`);
         } catch (err) {
             setError('formError', {
                 type: 'manual',
@@ -38,8 +44,10 @@ const Page = () => {
                     <input
                         id='email'
                         type='email'
+                        name='email'
                         className='w-full rounded-md text-black box-border pl-1'
-                        {...register('email', { required: 'Email is required' })}
+                        {...register('email', { required: true })}
+                        autoComplete='on'
                     />
                     {errors.email && <p className='text-red-500'>{errors.email.message}</p>}
                 </div>
@@ -49,8 +57,9 @@ const Page = () => {
                     <input
                         id='password'
                         type='password'
+                        name='password'
                         className='w-full rounded-md text-black box-border pl-1'
-                        {...register('password', { required: 'Password is required' })}
+                        {...register('password', { required: true })}
                     />
                     {errors.password && <p className='text-red-500'>{errors.password.message}</p>}
                 </div>

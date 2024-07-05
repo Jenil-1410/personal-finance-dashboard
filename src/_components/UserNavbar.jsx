@@ -3,15 +3,19 @@ import Link from "next/link";
 import { signOut } from 'firebase/auth';
 import { auth } from '@/FirebaseConfig';
 import { useFirebase } from '@/features/FirebaseContext';
+import { useRouter } from 'next/navigation';
 
 const UserNavbar = ({}) => {
 
     const { loggedIn, usrData } = useFirebase();
+    const router = useRouter();
 
     const handleSignOut = async() => {
         var alrt = window.confirm('Are you sure you want to log out?');
         if(alrt === true){
+          document.cookie = 'userToken=; Max-Age=0; path=/;';
           await signOut(auth)
+          router.push('/')
         }
         else{
           return
@@ -41,12 +45,5 @@ const UserNavbar = ({}) => {
     </div>
   )
 }
-
-export async function getServerSideProps(context) {
-
-    return {
-      props: {},
-    }
-  }
 
 export default UserNavbar
